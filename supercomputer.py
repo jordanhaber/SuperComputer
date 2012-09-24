@@ -55,7 +55,7 @@ class Slavery(threading.Thread):
         for slave in self.nodes:
             try:
                 conn.connect((slave[0], slave[1]))
-                conn.send('broadcast msg:')
+                conn.send('#broadcast')
                 conn.send(_data)
                 self.slaves.append((slave[0], slave[1], slave[2], 'waiting'))
             except Exception, e:
@@ -66,7 +66,41 @@ class Slavery(threading.Thread):
 
 
     def gather(self):
-        pass
+
+        conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)        
+        
+        waiting = True
+
+        while waiting:
+            
+            for slave in self.slaves:
+
+                msg = ''
+
+                if slave[3] == 'waiting':
+
+                    try:
+                        conn.send('#status')
+                        msg = conn.recv(1024)
+                    except Exception, e:
+                        print 'Unable to connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
+                        print 'Error: ' + str(e)
+
+                    if msg == 'ready':
+                        slave[3] = msg
+                        print 'Slave ' + str(slave[0]) + ' on port ' + str(slave[1]) + ' is ready'
+                    else:
+                        print 'Waiting on slave ' + str(slave[0]) + ' on port ' + str(slave[1])
+
+            waiting = False
+
+            for slave in self.slaves:
+                if slave[3] == 'waiting':
+                    waiting = True
+                    break            
+            
+        conn.close()
+
 
 
 if __name__ == '__main__':
@@ -77,7 +111,7 @@ if __name__ == '__main__':
     supercomputer.start()
 
     while True:
-        i = raw_input('\n[c] to read connections\n[r] to assign rank\n[b] to broadcast\n[q] to quit\n')
+        i = raw_input('\n[c] to read connections\n[r] to assign rank\n[b] to broadcast\n[g] to gather\n[q] to quit\n')
         if i == 'c':
             supercomputer.readConnections()
         if i == 'r':
@@ -85,5 +119,7 @@ if __name__ == '__main__':
         if i == 'b':
             data = raw_input('\nenter data to broadcast\n')            
             supercomputer.broadcast(data)
+        if i == 'g':
+            supercomputer.gather()
         if i == 'q':
             os._exit(1)
