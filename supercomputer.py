@@ -6,11 +6,6 @@ class Slavery(threading.Thread):
 
         self.port = _port
 
-        self.master = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.master.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.master.bind((socket.gethostname(), self.port))
-        self.master.listen(200)
-
         self.nodes = []
         self.slaves = []
 
@@ -37,7 +32,7 @@ class Slavery(threading.Thread):
         for slave in self.nodes:
             try:
                 conn.connect((slave[0], slave[1]))
-                conn.send('revolution:')
+                conn.send('#revolution')
                 conn.send(str(slave[2]))
             except Exception, e:
                 print 'Unable to connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
@@ -68,11 +63,16 @@ class Slavery(threading.Thread):
     def gather(self):
 
         conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)        
+
+        master = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        master.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        master.bind((socket.gethostname(), self.port))
+        master.listen(200)
         
         waiting = True
 
         while waiting:
-            
+
             for slave in self.slaves:
 
                 msg = ''
@@ -81,7 +81,7 @@ class Slavery(threading.Thread):
 
                     try:
                         conn.send('#status')
-                        msg = conn.recv(1024)
+                        msg = master.recv(1024)
                     except Exception, e:
                         print 'Unable to connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
                         print 'Error: ' + str(e)
@@ -100,6 +100,7 @@ class Slavery(threading.Thread):
                     break            
             
         conn.close()
+        master.close()
 
 
 
