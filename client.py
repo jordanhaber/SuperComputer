@@ -12,7 +12,7 @@ class Client(threading.Thread):
 
 		threading.Thread.__init__(self)
 		self.port = _port
-		self.status = "waiting"
+		self.status = "ready"
 		self.rank = 1
 		self.connected = False
 

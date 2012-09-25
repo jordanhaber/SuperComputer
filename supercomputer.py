@@ -12,7 +12,7 @@ class Slavery(threading.Thread):
 
 
     def run(self):
-       pass
+        pass
         #self.readConnections()
 
 
@@ -31,49 +31,52 @@ class Slavery(threading.Thread):
 
     def revolution(self):
         
-        conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        data = ''
-
         for slave in self.nodes:
             try:
+                data = ''
+                conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 conn.connect((slave[0], slave[1]))
                 data += '#revolution$'
                 data += str(slave[2])
                 conn.send(data)
+                conn.close()
             except Exception, e:
                 print 'Unable to connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
                 print 'Error: ' + str(e)
         
-        conn.close()
 
 
     def send(self, _rank, _data):
-        
-        conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        data = ''
+
+        if os.path.exists(_data):
+            _data = open(_data).read()
 
         for slave in self.nodes:
             if slave[2] == int(_rank):
                 try:
+                    data = ''
+                    conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     conn.connect((slave[0], slave[1]))
                     data += '#send$'
                     data += _data
                     data += '#end'
                     conn.send(data)
+                    conn.close()
                 except Exception, e:
                     print 'Unable to connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
                     print 'Error: ' + str(e)
 
-        conn.close()
 
 
     def broadcast(self, _data):
 
-        conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        data = ''
+        if os.path.exists(_data):
+            _data = open(_data).read()
 
         for slave in self.nodes:
             try:
+                data = ''
+                conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 conn.connect((slave[0], slave[1]))
                 data += '#broadcast$'
                 data += _data
@@ -83,7 +86,6 @@ class Slavery(threading.Thread):
                 print 'Unable to connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
                 print 'Error: ' + str(e)
 
-        conn.close()
 
 
     def gather(self):
@@ -91,19 +93,17 @@ class Slavery(threading.Thread):
         for slave in self.nodes:
             slave[3] = 'waiting'
 
-        conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)        
-        
         waiting = True
 
         while waiting:
 
             for slave in self.nodes:
 
-                msg = ''
-
                 if slave[3] == 'waiting':
 
                     try:
+                        msg = ''
+                        conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)        
                         conn.connect((slave[0], slave[1]))
                         conn.send('#status')
                         msg = conn.recv(64)
@@ -124,8 +124,6 @@ class Slavery(threading.Thread):
                 if slave[3] == 'waiting':
                     waiting = True
                     break            
-            
-        conn.close()
 
 
 
