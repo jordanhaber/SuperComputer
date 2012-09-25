@@ -6,28 +6,13 @@ class Slavery(threading.Thread):
 
         self.port = _port
 
-        '''self.master = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.master.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        #self.master.bind((socket.gethostname(), self.port))
-        self.master.bind(('localhost', self.port))
-        self.master.listen(200)
-        #self.master.setblocking(0)'''
-
         self.nodes = []
 
         threading.Thread.__init__(self)
 
 
     def run(self):
-       ''' while True:
-            try:
-                self.master.accept()
-                'slave gained'
-            except Exception, e:
-                print str(e)'''
-
        pass
-
         #self.readConnections()
 
 
