@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-from math import sqrt
-import math
-from mpi4py import MPI
-import time
+
 
 def isprime(n):
       """Test if n is a prime number or not."""

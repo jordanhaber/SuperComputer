@@ -71,7 +71,10 @@ class Slavery(threading.Thread):
     def broadcast(self, _data):
 
         if os.path.exists(_data):
+	    print "Sending data from file"
             _data = open(_data).read()
+        else:
+	    print "Sending command line"
 
         for slave in self.nodes:
             try:

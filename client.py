@@ -1,4 +1,6 @@
 import threading, socket, sys, os
+import math
+import time
 
 __author__ =  'Ethan Genz, Jordan Haber, Eduardo Mello'
 __version__=  '1.0'
@@ -51,14 +53,8 @@ class Client(threading.Thread):
 						break
 
 				data = data[:data.find('#end')]		
-				code_local = compile(data, '<string>', 'exec')
-
 				exec data;
 
-				#f = open('run.py', 'w')
-				#f.write(data)
-				#f.close()
-				
 				
 				
 				self.status = 'waiting'
