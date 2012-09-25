@@ -6,10 +6,12 @@ class Slavery(threading.Thread):
 
         self.port = _port
 
-        self.master = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        '''self.master = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.master.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.master.bind((socket.gethostname(), self.port))
+        #self.master.bind((socket.gethostname(), self.port))
+        self.master.bind(('localhost', self.port))
         self.master.listen(200)
+        #self.master.setblocking(0)'''
 
         self.nodes = []
 
@@ -17,8 +19,16 @@ class Slavery(threading.Thread):
 
 
     def run(self):
+       ''' while True:
+            try:
+                self.master.accept()
+                'slave gained'
+            except Exception, e:
+                print str(e)'''
+
+       pass
+
         #self.readConnections()
-        pass
 
 
     def readConnections(self):
@@ -28,19 +38,23 @@ class Slavery(threading.Thread):
         f = open('nodes.txt', 'r')
 
         for line in f:
+            tmp = line.strip()
+            tmp = tmp.split(' ')
             #Slave node: host, port, rank, status
-            self.nodes.append([line.strip(), self.port, len(self.nodes)+1, 'waiting'])
+            self.nodes.append([tmp[0], int(tmp[1]), len(self.nodes)+1, 'waiting'])
 
 
     def revolution(self):
         
         conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        
+        data = ''
+
         for slave in self.nodes:
             try:
                 conn.connect((slave[0], slave[1]))
-                conn.send('#revolution')
-                conn.send(str(slave[2]))
+                data += '#revolution$'
+                data += str(slave[2])
+                conn.send(data)
             except Exception, e:
                 print 'Unable to connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
                 print 'Error: ' + str(e)
@@ -51,15 +65,16 @@ class Slavery(threading.Thread):
     def send(self, _rank, _data):
         
         conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        data = ''
 
         for slave in self.nodes:
-            print type(slave[2])
-            print type(_rank)
             if slave[2] == int(_rank):
                 try:
                     conn.connect((slave[0], slave[1]))
-                    conn.send('#send')
-                    conn.send(_data)
+                    data += '#send$'
+                    data += _data
+                    data += '#end'
+                    conn.send(data)
                 except Exception, e:
                     print 'Unable to connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
                     print 'Error: ' + str(e)
@@ -70,12 +85,15 @@ class Slavery(threading.Thread):
     def broadcast(self, _data):
 
         conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        data = ''
 
         for slave in self.nodes:
             try:
                 conn.connect((slave[0], slave[1]))
-                conn.send('#broadcast')
-                conn.send(_data)
+                data += '#broadcast$'
+                data += _data
+                data += '#end'
+                conn.send(data)
             except Exception, e:
                 print 'Unable to connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
                 print 'Error: ' + str(e)
@@ -101,8 +119,10 @@ class Slavery(threading.Thread):
                 if slave[3] == 'waiting':
 
                     try:
+                        conn.connect((slave[0], slave[1]))
                         conn.send('#status')
-                        msg = self.master.recv(128)
+                        msg = conn.recv(64)
+                        conn.close()
                     except Exception, e:
                         print 'Unable to connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
                         print 'Error: ' + str(e)
@@ -115,7 +135,7 @@ class Slavery(threading.Thread):
 
             waiting = False
 
-            for slave in self.slaves:
+            for slave in self.nodes:
                 if slave[3] == 'waiting':
                     waiting = True
                     break            
@@ -147,5 +167,4 @@ if __name__ == '__main__':
         if i == 'g':
             supercomputer.gather()
         if i == 'q':
-            supercomputer.master.close()
             os._exit(1)
