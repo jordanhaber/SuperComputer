@@ -47,21 +47,10 @@ class Slavery(threading.Thread):
 
 
     def send(self, _rank, _data):
-<<<<<<< HEAD
-        
-        conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        data = ''
-        try:
-	  with open(_data) as f:
-	    _data = f.read()
-	except IOError as e:
-	  print 'Sendind comand'
-=======
 
         if os.path.exists(_data):
             _data = open(_data).read()
 
->>>>>>> 0986870290fe6122a7401ff964f629cd9e323348
         for slave in self.nodes:
             if slave[2] == int(_rank):
                 try:

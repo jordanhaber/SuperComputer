@@ -11,14 +11,12 @@ class Client(threading.Thread):
 	def __init__(self, _host, _port):
 
 		threading.Thread.__init__(self)
+
 		self.port = _port
-<<<<<<< HEAD
-		self.status = "waiting"
-		self.rank = -1
-=======
+
 		self.status = "ready"
-		self.rank = 1
->>>>>>> 0986870290fe6122a7401ff964f629cd9e323348
+		self.rank = -1
+
 		self.connected = False
 
 		self.slave = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
