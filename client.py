@@ -13,7 +13,7 @@ class Client(threading.Thread):
 		threading.Thread.__init__(self)
 		self.port = _port
 		self.status = "waiting"
-		self.rank = 1
+		self.rank = -1
 		self.connected = False
 
 		self.slave = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -47,16 +47,20 @@ class Client(threading.Thread):
 					if '#end' in data:
 						break
 
-				data = data[:data.find('#end')]
+				data = data[:data.find('#end')]		
+				code_local = compile(data, '<string>', 'exec')
 
+				exec data;
 
-				f = open('run.py', 'w')
-				f.write(data)
-				f.close()
+				#f = open('run.py', 'w')
+				#f.write(data)
+				#f.close()
+				
+				
 				
 				self.status = 'waiting'
 				#run new program
-				print 'new data: ' + data
+				#print 'new data: ' + data
 
 			elif msg.startswith("#revolution"):
 				self.rank = int(msg[msg.find('$')+1:])
@@ -88,19 +92,23 @@ class Executioner(threading.Thread):
 
 
 if __name__ == '__main__':
+	if len(sys.argv) == 3:
+		host = sys.argv[1]
+		port = sys.argv[2]
+		c = Client(host, int(port))
+		c.start()
+		while True:
+			i = raw_input('\n[r] to get rank\n[s] to get status\n[q] to quit\n')
+			if i == 'r':
+				print c.rank
+			if i == 's':
+				print c.status
+			if i == 'q':
+				c.slave.close()
+				os._exit(1)
+	else:
+		print "Usage 'python client.py <host> <port>'"
 
-	host = sys.argv[1]
-	port = sys.argv[2]
+	
 
-	c = Client(host, int(port))
-	c.start()
 
-	while True:
-		i = raw_input('\n[r] to get rank\n[s] to get status\n[q] to quit\n')
-		if i == 'r':
-			print c.rank
-		if i == 's':
-			print c.status
-		if i == 'q':
-			c.slave.close()
-			os._exit(1)

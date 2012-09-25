@@ -51,7 +51,11 @@ class Slavery(threading.Thread):
         
         conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         data = ''
-
+        try:
+	  with open(_data) as f:
+	    _data = f.read()
+	except IOError as e:
+	  print 'Sendind comand'
         for slave in self.nodes:
             if slave[2] == int(_rank):
                 try:
@@ -144,7 +148,7 @@ if __name__ == '__main__':
             supercomputer.revolution()
         if i == 's':
             rank = raw_input('\nenter rank\n')
-            data = raw_input('\nenter data\n')            
+            data = raw_input('\nenter data or file path\n')            
             supercomputer.send(rank, data)
         if i == 'b':
             data = raw_input('\nenter data\n')            
