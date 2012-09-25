@@ -6,8 +6,12 @@ class Slavery(threading.Thread):
 
         self.port = _port
 
+        self.master = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.master.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.master.bind((socket.gethostname(), self.port))
+        self.master.listen(200)
+
         self.nodes = []
-        self.slaves = []
 
         threading.Thread.__init__(self)
 
@@ -19,10 +23,13 @@ class Slavery(threading.Thread):
 
     def readConnections(self):
 
+        self.nodes = []
+        
         f = open('nodes.txt', 'r')
 
         for line in f:
-            self.nodes.append((line.strip(), self.port, len(self.nodes)+1))
+            #Slave node: host, port, rank, status
+            self.nodes.append([line.strip(), self.port, len(self.nodes)+1, 'waiting'])
 
 
     def revolution(self):
@@ -41,9 +48,26 @@ class Slavery(threading.Thread):
         conn.close()
 
 
-    def broadcast(self, _data):
+    def send(self, _rank, _data):
+        
+        conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        self.slaves = []
+        for slave in self.nodes:
+            print type(slave[2])
+            print type(_rank)
+            if slave[2] == int(_rank):
+                try:
+                    conn.connect((slave[0], slave[1]))
+                    conn.send('#send')
+                    conn.send(_data)
+                except Exception, e:
+                    print 'Unable to connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
+                    print 'Error: ' + str(e)
+
+        conn.close()
+
+
+    def broadcast(self, _data):
 
         conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -52,7 +76,6 @@ class Slavery(threading.Thread):
                 conn.connect((slave[0], slave[1]))
                 conn.send('#broadcast')
                 conn.send(_data)
-                self.slaves.append((slave[0], slave[1], slave[2], 'waiting'))
             except Exception, e:
                 print 'Unable to connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
                 print 'Error: ' + str(e)
@@ -62,18 +85,16 @@ class Slavery(threading.Thread):
 
     def gather(self):
 
-        conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)        
+        for slave in self.nodes:
+            slave[3] = 'waiting'
 
-        master = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        master.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        master.bind((socket.gethostname(), self.port))
-        master.listen(200)
+        conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)        
         
         waiting = True
 
         while waiting:
 
-            for slave in self.slaves:
+            for slave in self.nodes:
 
                 msg = ''
 
@@ -81,7 +102,7 @@ class Slavery(threading.Thread):
 
                     try:
                         conn.send('#status')
-                        msg = master.recv(1024)
+                        msg = self.master.recv(128)
                     except Exception, e:
                         print 'Unable to connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
                         print 'Error: ' + str(e)
@@ -100,7 +121,6 @@ class Slavery(threading.Thread):
                     break            
             
         conn.close()
-        master.close()
 
 
 
@@ -112,15 +132,20 @@ if __name__ == '__main__':
     supercomputer.start()
 
     while True:
-        i = raw_input('\n[c] to read connections\n[r] to assign rank\n[b] to broadcast\n[g] to gather\n[q] to quit\n')
+        i = raw_input('\n[c] to read connections\n[r] to assign rank\n[s] to send\n[b] to broadcast\n[g] to gather\n[q] to quit\n')
         if i == 'c':
             supercomputer.readConnections()
         if i == 'r':
             supercomputer.revolution()
+        if i == 's':
+            rank = raw_input('\nenter rank\n')
+            data = raw_input('\nenter data\n')            
+            supercomputer.send(rank, data)
         if i == 'b':
-            data = raw_input('\nenter data to broadcast\n')            
+            data = raw_input('\nenter data\n')            
             supercomputer.broadcast(data)
         if i == 'g':
             supercomputer.gather()
         if i == 'q':
+            supercomputer.master.close()
             os._exit(1)
