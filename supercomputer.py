@@ -117,13 +117,14 @@ class Slavery(threading.Thread):
                     except Exception, e:
                         print 'Unable to connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
                         print 'Error: ' + str(e)
+                        pass
 
-                    if msg == 'ready':
+                    '''if msg == 'ready':
                         slave[3] = msg
                         print 'Slave ' + str(slave[0]) + ' on port ' + str(slave[1]) + ' is ready'
                         
                     else:
-                        print 'Waiting on slave ' + str(slave[0]) + ' on port ' + str(slave[1])
+                        print 'Waiting on slave ' + str(slave[0]) + ' on port ' + str(slave[1])'''
 
             waiting = False
 
