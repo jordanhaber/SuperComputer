@@ -91,7 +91,7 @@ class Executioner(threading.Thread):
 		self.rank_max = _rank_max
 		self.data = _data
 		self.status = 'waiting'
-		self.solution = []
+		self.solution = ''
 	
 	def run(self):		
 		

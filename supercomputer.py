@@ -9,7 +9,7 @@ class Slavery(threading.Thread):
         self.data_file = ''
         self.rank = 0
         self.rank_max = 0
-        self.solution = []
+        self.solution = ''
 
         threading.Thread.__init__(self)
 
@@ -109,7 +109,7 @@ class Slavery(threading.Thread):
             slave[3] = 'waiting'
 
         waiting = True
-        self.solution = []
+        self.solution = ''
 
         while waiting:
 
@@ -133,7 +133,7 @@ class Slavery(threading.Thread):
 
                             data = data[:data.rfind('#end')]
                             print 'answer recieved'
-                            self.solution.append(data)
+                            self.solution += data
                         conn.close()
                     except Exception, e:
                         print 'Unable to connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
