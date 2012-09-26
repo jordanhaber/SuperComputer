@@ -5,8 +5,10 @@ class Slavery(threading.Thread):
     def __init__(self, _port):
 
         self.port = _port
-
         self.nodes = []
+        self.data_file = ''
+        self.rank = 0
+        self.rank_max = 0
 
         threading.Thread.__init__(self)
 
@@ -31,6 +33,8 @@ class Slavery(threading.Thread):
 
     def revolution(self):
         
+        self.rank_max = len(self.nodes)
+
         for slave in self.nodes:
             try:
                 data = ''
@@ -38,7 +42,7 @@ class Slavery(threading.Thread):
                 conn.connect((slave[0], slave[1]))
                 data += '#revolution$'
                 data += str(slave[2])
-                data += '$' + str(len(self.nodes))
+                data += '$' + str(self.rank_max)
                 conn.send(data)
                 conn.close()
             except Exception, e:
@@ -50,7 +54,11 @@ class Slavery(threading.Thread):
     def send(self, _rank, _data):
 
         if os.path.exists(_data):
+	    print "Sending data from file"
             _data = open(_data).read()
+            self.data_file = _data
+        else:
+	    print "Sending data from input"
 
         for slave in self.nodes:
             if slave[2] == int(_rank):
@@ -74,6 +82,7 @@ class Slavery(threading.Thread):
         if os.path.exists(_data):
 	    print "Sending data from file"
             _data = open(_data).read()
+            self.data_file = _data
         else:
 	    print "Sending data from input"
 
@@ -134,7 +143,10 @@ class Slavery(threading.Thread):
             for slave in self.nodes:
                 if slave[3] == 'waiting':
                     waiting = True
-                    break            
+                    break  
+
+    def reduce(self):
+        exec self.data_file
 
 
 
