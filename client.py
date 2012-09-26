@@ -1,6 +1,4 @@
-import threading, socket, sys, os
-import math
-import time
+import threading, socket, sys, os, math, time
 
 __author__ =  'Ethan Genz, Jordan Haber, Eduardo Mello'
 __version__=  '1.0'
