@@ -18,6 +18,7 @@ class Client(threading.Thread):
 
 		self.status = "ready"
 		self.rank = -1
+		self.rank_max = 1
 
 		self.connected = False
 
@@ -61,8 +62,9 @@ class Client(threading.Thread):
 				#print 'new data: ' + data
 
 			elif msg.startswith("#revolution"):
-				self.rank = int(msg[msg.find('$')+1:])
+				self.rank = int(msg[msg.find('$')+1:msg.rfind('$')])
 				print 'new rank: '+ str(self.rank)
+				self.rank_max = int(msg[msg.rfind('$')+1:])
 
 			elif msg.startswith("#status"):
 				self.conn.send(self.e.status)
@@ -112,7 +114,7 @@ if __name__ == '__main__':
 		while True:
 			i = raw_input('\n[r] to get rank\n[s] to get status\n[q] to quit\n')
 			if i == 'r':
-				print c.rank
+				print str(c.rank) + '/'  + str(c.rank_max)
 			if i == 's':
 				print c.e.status
 			if i == 'q':

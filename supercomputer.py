@@ -1,4 +1,4 @@
-import socket, threading, sys, os
+import socket, threading, sys, os, time
 
 class Slavery(threading.Thread):
 
@@ -38,6 +38,7 @@ class Slavery(threading.Thread):
                 conn.connect((slave[0], slave[1]))
                 data += '#revolution$'
                 data += str(slave[2])
+                data += '$' + str(len(self.nodes))
                 conn.send(data)
                 conn.close()
             except Exception, e:
@@ -74,7 +75,7 @@ class Slavery(threading.Thread):
 	    print "Sending data from file"
             _data = open(_data).read()
         else:
-	    print "Sending command line"
+	    print "Sending data from input"
 
         for slave in self.nodes:
             try:
@@ -101,6 +102,8 @@ class Slavery(threading.Thread):
         while waiting:
 
             for slave in self.nodes:
+                
+                time.sleep(.2)
 
                 if slave[3] == 'waiting':
 
@@ -119,9 +122,9 @@ class Slavery(threading.Thread):
                         print 'Error: ' + str(e)
                         pass
 
-                    '''if msg == 'ready':
+                    if msg == 'ready':
                         slave[3] = msg
-                        print 'Slave ' + str(slave[0]) + ' on port ' + str(slave[1]) + ' is ready'
+                        '''print 'Slave ' + str(slave[0]) + ' on port ' + str(slave[1]) + ' is ready'
                         
                     else:
                         print 'Waiting on slave ' + str(slave[0]) + ' on port ' + str(slave[1])'''
