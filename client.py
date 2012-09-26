@@ -1,5 +1,3 @@
-
-from numpy  import *
 import threading, socket, sys, os, math, time
 
 __author__ =  'Ethan Genz, Jordan Haber, Eduardo Mello'
