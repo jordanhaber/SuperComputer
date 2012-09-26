@@ -67,7 +67,7 @@ class Client(threading.Thread):
 			elif msg.startswith("#status"):
 				self.conn.send(self.e.status)
 				if self.e.status == 'ready':
-					self.conn.send('#'.join(self.e.solution))
+					self.conn.send(str(self.e.solution))
 			else:
 				pass
 				#self.conn.send("Client is busy or invalid command.")       
