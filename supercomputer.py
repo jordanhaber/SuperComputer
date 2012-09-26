@@ -140,7 +140,11 @@ class Slavery(threading.Thread):
 
 if __name__ == '__main__':
     
-    port = int(sys.argv[1])
+    try:
+        port = int(sys.argv[1])
+    except:
+        print "Usage 'python supercomputer.py <port>'"
+        os._exit(1)
 
     supercomputer = Slavery(port)
     supercomputer.start()

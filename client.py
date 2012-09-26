@@ -17,7 +17,6 @@ class Client(threading.Thread):
 		self.port = _port
 		self.host = _host
 
-		self.status = "ready"
 		self.rank = -1
 		self.rank_max = 1
 
@@ -107,22 +106,36 @@ class Executioner(threading.Thread):
 
 
 if __name__ == '__main__':
-	if len(sys.argv) == 3:
-		host = sys.argv[1]
-		port = sys.argv[2]
-		c = Client(host, int(port))
-		c.start()
-		while True:
-			i = raw_input('\n[r] to get rank\n[s] to get status\n[q] to quit\n')
-			if i == 'r':
-				print str(c.rank) + '/'  + str(c.rank_max)
-			if i == 's':
-				print c.e.status
-			if i == 'q':
-				c.slave.close()
-				os._exit(1)
+
+	host = ''
+	port = 0
+
+	if len(sys.argv) == 2:
+		try:
+			port = sys.argv[1]
+		except:
+			print "Usage 'python client.py <host> <port>'"
+			os._exit(1)
 	else:
-		print "Usage 'python client.py <host> <port>'"
+		try:
+			host = sys.argv[1]
+			port = sys.argv[2]
+		except:
+			print "Usage 'python client.py <host> <port>'"
+			os._exit(1)
+
+	c = Client(host, int(port))
+	c.start()
+	while True:
+		i = raw_input('\n[r] to get rank\n[s] to get status\n[q] to quit\n')
+		if i == 'r':
+			print str(c.rank) + '/'  + str(c.rank_max)
+		elif i == 's':
+			print c.e.status
+		elif i == 'q':
+			c.slave.close()
+			os._exit(1)
+
 
 	
 
