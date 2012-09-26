@@ -37,7 +37,7 @@ class Slavery(threading.Thread):
         self.rank_max = len(self.nodes)
 
         for slave in self.nodes:
-            print 'connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
+            #print 'connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
             try:
                 data = ''
                 conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -137,8 +137,7 @@ class Slavery(threading.Thread):
 
                     if msg == 'ready':
                         slave[3] = msg
-                        '''print 'Slave ' + str(slave[0]) + ' on port ' + str(slave[1]) + ' is ready'
-                        
+                        '''print 'Slave ' + str(slave[0]) + ' on port ' + str(slave[1]) + ' is ready'                        
                     else:
                         print 'Waiting on slave ' + str(slave[0]) + ' on port ' + str(slave[1])'''
 

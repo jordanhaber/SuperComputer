@@ -55,7 +55,7 @@ class Client(threading.Thread):
 
 				data = data[:data.find('#end')]		
 
-				self.e = Executioner(self.rank, data)
+				self.e = Executioner(self.rank, self.rank_max, data)
 				self.e.start()
 
 				#run new program
@@ -84,10 +84,11 @@ class Client(threading.Thread):
 
 class Executioner(threading.Thread):
 
-	def __init__(self, _rank, _data):
+	def __init__(self, _rank, _rank_max, _data):
 		
 		threading.Thread.__init__(self)
 		self.rank = _rank
+		self.rank_max = _rank_max
 		self.data = _data
 		self.status = 'waiting'
 		self.solution = []
