@@ -9,6 +9,7 @@ class Slavery(threading.Thread):
         self.data_file = ''
         self.rank = 0
         self.rank_max = 0
+        self.solution = []
 
         threading.Thread.__init__(self)
 
@@ -36,6 +37,7 @@ class Slavery(threading.Thread):
         self.rank_max = len(self.nodes)
 
         for slave in self.nodes:
+            print 'connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
             try:
                 data = ''
                 conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -107,6 +109,7 @@ class Slavery(threading.Thread):
             slave[3] = 'waiting'
 
         waiting = True
+        self.solution = []
 
         while waiting:
 
@@ -124,7 +127,8 @@ class Slavery(threading.Thread):
                         msg = conn.recv(64)
                         if msg == 'ready':
                             data = conn.recv(1024)
-                            print data
+                            print 'answer recieved'
+                            self.solution.append(data)
                         conn.close()
                     except Exception, e:
                         print 'Unable to connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
@@ -162,7 +166,7 @@ if __name__ == '__main__':
     supercomputer.start()
 
     while True:
-        i = raw_input('\n[c] to read connections\n[r] to assign rank\n[s] to send\n[b] to broadcast\n[g] to gather\n[q] to quit\n')
+        i = raw_input('\n[c] to read connections\n[r] to assign rank\n[s] to send\n[b] to broadcast\n[g] to gather\n[p] to reduce and display answer\n[q] to quit\n')
         if i == 'c':
             supercomputer.readConnections()
         if i == 'r':
@@ -176,5 +180,8 @@ if __name__ == '__main__':
             supercomputer.broadcast(data)
         if i == 'g':
             supercomputer.gather()
+        if i == 'p':
+            supercomputer.reduce()
+            print supercomputer.solution
         if i == 'q':
             os._exit(1)
