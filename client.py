@@ -53,11 +53,10 @@ class Client(threading.Thread):
 						break
 
 				data = data[:data.find('#end')]		
-				exec data;
 
-				
-				
-				self.status = 'waiting'
+				self.e = Executioner(self.rank, data)
+				self.e.start()
+
 				#run new program
 				#print 'new data: ' + data
 
@@ -66,7 +65,9 @@ class Client(threading.Thread):
 				print 'new rank: '+ str(self.rank)
 
 			elif msg.startswith("#status"):
-				self.conn.send(self.status)
+				self.conn.send(self.e.status)
+				if self.e.status == 'ready':
+					self.conn.send('#'.join(self.e.solution))
 			else:
 				pass
 				#self.conn.send("Client is busy or invalid command.")       
@@ -81,10 +82,22 @@ class Client(threading.Thread):
 
 class Executioner(threading.Thread):
 
-	def __init__(self, _client):
+	def __init__(self, _rank, _data):
 		
 		threading.Thread.__init__(self)
-		self.c = _client
+		self.rank = _rank
+		self.data = _data
+		self.status = 'waiting'
+		self.solution = []
+	
+	def run(self):		
+		
+		try:
+			exec self.data
+		except Exception, e:
+			print 'unable to run program'
+			print 'Error: ' + str(e)
+		self.status = 'ready'
 
 	
 
@@ -101,7 +114,7 @@ if __name__ == '__main__':
 			if i == 'r':
 				print c.rank
 			if i == 's':
-				print c.status
+				print c.e.status
 			if i == 'q':
 				c.slave.close()
 				os._exit(1)

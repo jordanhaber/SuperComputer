@@ -110,6 +110,9 @@ class Slavery(threading.Thread):
                         conn.connect((slave[0], slave[1]))
                         conn.send('#status')
                         msg = conn.recv(64)
+                        if msg == 'ready':
+                            data = conn.recv(1024)
+                            print data
                         conn.close()
                     except Exception, e:
                         print 'Unable to connect to ' + str(slave[0]) + ' on port ' + str(slave[1])
@@ -118,6 +121,7 @@ class Slavery(threading.Thread):
                     if msg == 'ready':
                         slave[3] = msg
                         print 'Slave ' + str(slave[0]) + ' on port ' + str(slave[1]) + ' is ready'
+                        
                     else:
                         print 'Waiting on slave ' + str(slave[0]) + ' on port ' + str(slave[1])
 

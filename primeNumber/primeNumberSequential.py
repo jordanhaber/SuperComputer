@@ -22,6 +22,7 @@ for i in range(a,b,2):
 	if isprime(i):
 	  primenumbers.append(i)
 	  #print i, len(primenumbers)
+self.solution.append("%d Prime numbers found between  %d and %d.\n" % (len(primenumbers), a, b))
 print("%d Prime numbers found between  %d and %d.\n" % (len(primenumbers), a, b))
 t2 = time.time()
 print ("Time elapsed:")
