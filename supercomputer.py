@@ -1,4 +1,4 @@
-import socket, threading, sys, os, time
+import socket, threading, sys, os, time, math, numpy
 
 class Slavery(threading.Thread):
 
