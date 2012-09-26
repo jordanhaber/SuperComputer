@@ -15,6 +15,7 @@ class Client(threading.Thread):
 		threading.Thread.__init__(self)
 
 		self.port = _port
+		self.host = _host
 
 		self.status = "ready"
 		self.rank = -1
@@ -24,7 +25,7 @@ class Client(threading.Thread):
 
 		self.slave = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.slave.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)                       
-		self.slave.bind(('localhost', self.port))
+		self.slave.bind((self.host, self.port))
 		self.slave.listen(1)
 		
 			
