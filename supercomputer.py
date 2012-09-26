@@ -125,8 +125,13 @@ class Slavery(threading.Thread):
                         conn.connect((slave[0], slave[1]))
                         conn.send('#status')
                         msg = conn.recv(64)
+
                         if msg == 'ready':
-                            data = conn.recv(1024)
+                            data = ''
+                            while not '#end' in data:
+                                data += conn.recv(1024)
+
+                            data = data[:data.rfind('#end')]
                             print 'answer recieved'
                             self.solution.append(data)
                         conn.close()
@@ -137,10 +142,7 @@ class Slavery(threading.Thread):
 
                     if msg == 'ready':
                         slave[3] = msg
-                        '''print 'Slave ' + str(slave[0]) + ' on port ' + str(slave[1]) + ' is ready'                        
-                    else:
-                        print 'Waiting on slave ' + str(slave[0]) + ' on port ' + str(slave[1])'''
-
+                        
             waiting = False
 
             for slave in self.nodes:
@@ -181,6 +183,5 @@ if __name__ == '__main__':
             supercomputer.gather()
         if i == 'p':
             supercomputer.reduce()
-            print supercomputer.solution
         if i == 'q':
             os._exit(1)

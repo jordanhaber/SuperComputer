@@ -37,13 +37,15 @@ class Client(threading.Thread):
 
 		while True:
 			
-			msg = self.conn.recv(128)
+			msg = self.conn.recv(1024)
 
 			if not msg:
 				self.connected = False
 				self.connect()
 
 			if msg.startswith("#broadcast") or msg.startswith('#send'):
+
+				print 'executing new program'
 
 				data = msg[msg.find('$')+1:]
 
@@ -69,7 +71,7 @@ class Client(threading.Thread):
 			elif msg.startswith("#status"):
 				self.conn.send(self.e.status)
 				if self.e.status == 'ready':
-					self.conn.send(str(self.e.solution))
+					self.conn.send(str(self.e.solution)+'#end')
 			else:
 				pass
 				#self.conn.send("Client is busy or invalid command.")       
